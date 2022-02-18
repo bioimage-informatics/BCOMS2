@@ -10,8 +10,8 @@ The paper is [here](https://bmcbioinformatics.biomedcentral.com/articles/10.1186
 
 ### Examples
 <p>
-  <img src="/Pictures/6cells.png">
-  <img src="/Pictures/12cells.png">
-  <img src="/Pictures/24cells.png">
-  <img src="/Pictures/44cells.png">
+  <img height="140px" src="/Pictures/6cells.png">
+  <img height="140px" src="/Pictures/12cells.png">
+  <img height="140px" src="/Pictures/24cells.png">
+  <img height="140px" src="/Pictures/44cells.png">
 </p>
