@@ -1,4 +1,4 @@
-function featureTable = calcDynamicFeatures( seg, resXY, resZ )
+function featureTable = calcFeatures( seg, resXY, resZ )
 %CELLSHAPEFEATURES
 
 magMemb = double(seg) * 1000;
@@ -22,7 +22,7 @@ Label = Label(:,2);
 %% 3D shape features
 [r,c,z,t] = size(lab3);
 lab3 = reshape(lab3, r,c,z*t);
-stats = regionprops3(lab3, 'Volume', 'SurfaceArea', 'PrincipalAxisLength', 'Solidity');
+stats = regionprops3(lab3, 'Volume', 'SurfaceArea', 'PrincipalAxisLength', 'Extent', 'Solidity');
 
 % Vol
 VolumeOri = cat(1, stats.Volume);
@@ -30,11 +30,13 @@ Volume = cat(1, stats.Volume) * (resXY * resXY * resZ);
 SurfaceAreaOri = cat(1, stats.SurfaceArea);
 SurfaceArea = cat(1, stats.SurfaceArea) * (resXY * resXY * resZ);
 PrincipalAxisLength = cat(1, stats.PrincipalAxisLength);
-PrincipalAxisLengthFirst = PrincipalAxisLength(:,1) * (resXY * resXY * resZ)^(1/3);
-PrincipalAxisLengthSecond = PrincipalAxisLength(:,2) * (resXY * resXY * resZ)^(1/3);
-PrincipalAxisLengthThird = PrincipalAxisLength(:,3) * (resXY * resXY * resZ)^(1/3);
+LongAxis = PrincipalAxisLength(:,1) * (resXY * resXY * resZ)^(1/3);
+MiddleAxis = PrincipalAxisLength(:,2) * (resXY * resXY * resZ)^(1/3);
+ShortAxis = PrincipalAxisLength(:,3) * (resXY * resXY * resZ)^(1/3);
+Middle_to_Long = MiddleAxis ./ LongAxis;
+Short_to_Long = ShortAxis ./ LongAxis;
 Solidity = cat(1, stats.Solidity);
-SAtoV = SurfaceAreaOri ./ VolumeOri;
+SA_to_V = SurfaceAreaOri ./ VolumeOri;
 
 % Centroids
 CentroidX = cent(:,1) * resXY;
@@ -42,11 +44,14 @@ CentroidY = cent(:,2) * resXY;
 CentroidZ = cent(:,3) * resZ;
 CentroidT = cent(:,4);
 
+% Extent
+Extent = cat(1, stats.Extent);
+
 % Sphericity
 Sphericity = pi^(1/3) * ((6 * VolumeOri).^(2/3)) ./ SurfaceAreaOri;
 
 %% table
-featureTable = table(Label, CentroidX, CentroidY, CentroidZ, CentroidT, Volume, SurfaceArea, SAtoV, Solidity, ...
-                      PrincipalAxisLengthFirst, PrincipalAxisLengthSecond, PrincipalAxisLengthThird, Sphericity);
+featureTable = table(Label, CentroidX, CentroidY, CentroidZ, CentroidT, Volume, SurfaceArea, SA_to_V,...
+    Solidity, Extent, Sphericity, LongAxis, MiddleAxis, ShortAxis, Middle_to_Long, Short_to_Long);
 
 

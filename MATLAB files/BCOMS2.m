@@ -22,7 +22,7 @@ function varargout = BCOMS2(varargin)
 
 % Edit the above text to modify the response to help BCOMS2
 
-% Last Modified by GUIDE v2.5 16-Feb-2022 03:18:31
+% Last Modified by GUIDE v2.5 21-Jun-2022 14:30:05
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -56,7 +56,13 @@ function BCOMS2_OpeningFcn(hObject, eventdata, handles, varargin)
 handles.flagRoiExtract = 0;
 handles.flagEmbReg = 0;
 handles.flagMemb = 0;
-handles.membraneDir = './';
+handles.collectionDiv = get(handles.checkbox1, 'Value');
+% handles.membraneDir = './';
+try
+    handles.inputDir = get(handles.edit1, 'String');
+catch
+    handles.inputDir = './';
+end
 handles.z_select='radiobutton1';
 
 % Choose default command line output for BCOMS2
@@ -82,24 +88,38 @@ varargout{1} = handles.output;
 %% Image data
 % pushbutton
 function pushbutton5_Callback(hObject, eventdata, handles)
-[fileName, pathName] = uigetfile('*','Select membrane image file');
-handles.membraneDir = pathName;
-handles.memraneFilename = [pathName, fileName];
-if handles.memraneFilename == 0; return; end
-set(handles.edit1, 'String', num2str(handles.memraneFilename));
+% [fileName, pathName] = uigetdir('*','Select membrane image file');
+% handles.membraneDir = pathName;
+
+handles.inputDir = uigetdir('*','Select membrane image file');
+handles.resultDir = regexprep(handles.inputDir, '\\\w*$q?', '');
+handles.resultDir = [handles.resultDir, filesep, 'Output'];
+% handles.memraneFilename = [pathName, fileName];
+% if handles.memraneFilename == 0; return; end
+% set(handles.edit1, 'String', num2str(handles.memraneFilename));
+set(handles.edit1, 'String', num2str(handles.inputDir));
 guidata(hObject, handles);
 
-function pushbutton6_Callback(hObject, eventdata, handles)
-[fileName, pathName] = uigetfile('*','Select nuclear segmentation file', handles.membraneDir);
-handles.nucleusFilename = [pathName, fileName];
-if handles.nucleusFilename == 0; return; end
-set(handles.edit2, 'String', num2str(handles.nucleusFilename));
-guidata(hObject, handles);
 
-function pushbutton7_Callback(hObject, eventdata, handles)
-handles.resultDir = uigetdir(handles.membraneDir,'Select results directory');
-if handles.resultDir == 0; return; end
-set(handles.edit3, 'String', num2str(handles.resultDir));
+% function pushbutton5_Callback(hObject, eventdata, handles)
+% [fileName, pathName] = uigetfile('*','Select membrane image file');
+% handles.membraneDir = pathName;
+% handles.memraneFilename = [pathName, fileName];
+% if handles.memraneFilename == 0; return; end
+% set(handles.edit1, 'String', num2str(handles.memraneFilename));
+% guidata(hObject, handles);
+% 
+% function pushbutton6_Callback(hObject, eventdata, handles)
+% [fileName, pathName] = uigetfile('*','Select nuclear segmentation file', handles.membraneDir);
+% handles.nucleusFilename = [pathName, fileName];
+% if handles.nucleusFilename == 0; return; end
+% set(handles.edit2, 'String', num2str(handles.nucleusFilename));
+% guidata(hObject, handles);
+% 
+% function pushbutton7_Callback(hObject, eventdata, handles)
+% handles.resultDir = uigetdir(handles.membraneDir,'Select results directory');
+% if handles.resultDir == 0; return; end
+% set(handles.edit3, 'String', num2str(handles.resultDir));
 
 % Folders
 handles.zRangeDir = [handles.resultDir, filesep, 'ZRange'];
@@ -107,6 +127,7 @@ handles.membImgDir = [handles.resultDir, filesep, 'Membrane_image'];
 handles.nucImgDir = [handles.resultDir, filesep, 'Nuclear_image'];
 handles.embRegDir = [handles.resultDir, filesep, 'Embryonic_region'];
 handles.membSegDir = [handles.resultDir, filesep, 'Membrane_segmentation'];
+handles.nucSegDir = [handles.resultDir, filesep, 'Nuclear_segmentation'];
 handles.embRegStackDir = [handles.resultDir, filesep, 'Embryonic_region', filesep, 'Stack'];
 handles.membSegStackDir = [handles.membSegDir, filesep, 'MatFile'];
 handles.morphFeatDir = [handles.resultDir, filesep, 'Morphological_features'];
@@ -131,24 +152,24 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-function edit2_Callback(hObject, eventdata, handles)
-handles.nucleusFilename = get(hObject,'String');
-guidata(hObject, handles);
-
-function edit2_CreateFcn(hObject, eventdata, handles)
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-function edit3_Callback(hObject, eventdata, handles)
-handles.resultDir = get(hObject,'String');
-guidata(hObject, handles);
-
-function edit3_CreateFcn(hObject, eventdata, handles)
-
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
+% function edit2_Callback(hObject, eventdata, handles)
+% handles.nucleusFilename = get(hObject,'String');
+% guidata(hObject, handles);
+% 
+% function edit2_CreateFcn(hObject, eventdata, handles)
+% if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+%     set(hObject,'BackgroundColor','white');
+% end
+% 
+% function edit3_Callback(hObject, eventdata, handles)
+% handles.resultDir = get(hObject,'String');
+% guidata(hObject, handles);
+% 
+% function edit3_CreateFcn(hObject, eventdata, handles)
+% 
+% if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+%     set(hObject,'BackgroundColor','white');
+% end
 
 
 %% Image information
@@ -192,7 +213,7 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-%% ROI extraction
+%% Image read & ROI extraction
 function pushbutton8_Callback(hObject, eventdata, handles)
 
 if ~isfield(handles, 'resXY') || ~isfield(handles, 'resZ') || ~isfield(handles, 'numZ') || ~isfield(handles, 'numT')
@@ -202,11 +223,86 @@ if ~isfield(handles, 'resXY') || ~isfield(handles, 'resZ') || ~isfield(handles, 
     return
 end
 
-h = waitbar(0.1, 'Reading image files');
+% inputDirのファイル名取得
+filenames = dir(handles.inputDir);
+filenames = {filenames.name};
 
-tifRead(handles.memraneFilename, handles.numZ, handles.numT, handles.membImgDir)
-waitbar(0.5, h);
-tifRead(handles.nucleusFilename, handles.numZ, handles.numT, handles.nucImgDir)
+% Membrane image
+h = waitbar(0.1, 'Reading Membrane\_image file');
+pos = contains(filenames, 'Membrane_image','IgnoreCase',true);
+try
+    filename = filenames{pos};
+catch
+    delete(h)
+    ed = errordlg('Could not find Membrane\_image file','Error');
+    set(ed, 'WindowStyle', 'modal');
+end
+try
+    tifRead([handles.inputDir, filesep, filename], handles.numZ, handles.numT, handles.membImgDir)
+catch
+    delete(h)
+    ed = errordlg('Could not read Membrane\_image file','Error');
+    set(ed, 'WindowStyle', 'modal');
+end
+% delete(h)
+
+% Nucleus image
+waitbar(0.4, h, 'Reading Nucleus\_image file');
+pos = contains(filenames, 'Nucleus_image','IgnoreCase',true);
+try
+    filename = filenames{pos};
+catch
+    delete(h)
+    ed = errordlg('Could not find Nucleus\_image file','Error');
+    set(ed, 'WindowStyle', 'modal');
+end
+try
+    tifRead([handles.inputDir, filesep, filename], handles.numZ, handles.numT, handles.nucImgDir)
+catch
+    delete(h)
+    ed = errordlg('Could not read Membrane\_image file','Error');
+    set(ed, 'WindowStyle', 'modal');
+end
+waitbar(0.75, h);
+% delete(h)
+
+% Nucleus segmentation
+if handles.collectionDiv
+    waitbar(0.8, h, 'Reading Nucleus\_segmentation file');
+    pos = contains(filenames, 'Nucleus_segmentation','IgnoreCase',true);
+    try
+        filename = filenames{pos};
+    catch
+        delete(h)
+        ed = errordlg('Could not find Nucleus\_segmentation file','Error');
+        set(ed, 'WindowStyle', 'modal');
+    end
+    try
+        tifRead([handles.inputDir, filesep, filename], handles.numZ, handles.numT, handles.nucImgDir)
+    catch
+        delete(h)
+        ed = errordlg('Could not read Nucleus\_segmentation file','Error');
+        set(ed, 'WindowStyle', 'modal');
+    end
+    waitbar(0.95, h);
+    delete(h)
+end
+
+% SVM model
+if handles.collectionDiv
+    h = waitbar(0.97, 'Reading Trained\_model file');
+    pos = contains(filenames, 'Trained_model','IgnoreCase',true);
+    try
+        filename = filenames{pos};
+    catch
+        delete(h)
+        ed = errordlg('Could not find Trained\_model file','Error');
+        set(ed, 'WindowStyle', 'modal');
+    end
+    handles.svmModelDir = [handles.inputDir, filesep, filename];
+    waitbar(0.99, h);
+    delete(h)
+end
 
 handles.flagRoiExtract = 1;
 guidata(hObject, handles);
@@ -267,7 +363,7 @@ end
 h = waitbar(0.1, ['Computing embryonic region with the volume ratio: ', num2str(handles.volRatioThresh)]);
 ME = 0;
 try
-    h = embryonicRegion(handles.membImgDir, handles.nucImgDir, handles.zRangeDir, handles.embRegDir, handles.volRatioThresh, h);
+    h = embryonicRegion(handles.membImgDir, handles.nucSegDir, handles.zRangeDir, handles.embRegDir, handles.volRatioThresh, h);
 catch ME
     delete(h);
     h = errordlg([ME.identifier, newline, ME.message]);
@@ -310,8 +406,14 @@ end
 h = waitbar(0.1, 'Computing membrane segmentation');
 ME = 0;
 try
-    h = waterMembrane( handles.membImgDir, handles.nucImgDir, handles.embRegStackDir, handles.membSegDir, handles.resXY, handles.resZ, h );
-%     simpleWater( handles.membImgDir, handles.nucImgDir, handles.embRegStackDir, handles.membSegDir, handles.resXY, handles.resZ );
+    if handles.collectionDiv
+        h = waterMembrane( handles.membImgDir, handles.nucSegDir, handles.embRegStackDir, ...
+            handles.membSegDir, handles.resXY, handles.resZ, h,  handles.nucImgDir, handles.svmModelDir);
+    else
+        h = waterMembrane( handles.membImgDir, handles.nucSegDir, handles.embRegStackDir, ...
+            handles.membSegDir, handles.resXY, handles.resZ, h );
+    end
+%     simpleWater( handles.membImgDir, handles.nucSegDir, handles.embRegStackDir, handles.membSegDir, handles.resXY, handles.resZ );
 catch ME
     delete(h);
     h = errordlg([ME.identifier, newline, ME.message]);
@@ -346,3 +448,10 @@ delete(h);
 if ME==0
     h = msgbox('Morphological features extraction completed');
 end
+
+
+% --- Executes on button press in checkbox1.
+function checkbox1_Callback(hObject, eventdata, handles)
+
+handles.collectionDiv = get(hObject,'Value');
+guidata(hObject, handles);

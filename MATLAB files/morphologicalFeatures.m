@@ -11,7 +11,7 @@ seg = oneStackLoad(segDir);
 waitbar(0.2, h);
 
 %% Single cell features
-dynamicFeatureTable = calcDynamicFeatures( seg, resXY, resZ );
+dynamicFeatureTable = calcFeatures( seg, resXY, resZ );
 
 % Cell names
 CellName = tikan(cellstr(num2str(dynamicFeatureTable.Label, '%05i')), cellstr(num2str(id, '%05i')), name);

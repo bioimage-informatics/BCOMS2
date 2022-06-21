@@ -1,10 +1,4 @@
-function h = waterMembrane( membImgDir, nucValDir, embRegDir, membSegDir, resXY, resZ, h, varargin )
-
-%% parse input
-if ~isempty(varargin)
-    nucImgDir = varargin{1};
-    trainedModelDir = varargin{2};
-end
+function h = waterMembrane( membImgDir, nucValDir, embRegDir, membSegDir, resXY, resZ, h )
 
 %% Folders
 % Temp folders
@@ -23,6 +17,8 @@ mkdir(waterMembDir);
 matStackDir = [membSegDir, filesep, 'MatFile'];
 mkdir(matStackDir);
 
+% waitbar
+waitbar(0.2, h);
 
 %% Load data
 memb = oneStackLoad(membImgDir);
@@ -38,32 +34,12 @@ ratio=round(resZ/resXY);
 [~,~,~,tLen] = size(memb);
 tList = 1:tLen;
 
-% applyCytokinesisのnucNameはこのプログラムの nuc
-if ~isempty(varargin)
-    nucImg = oneStackLoad(nucImgDir);
-    svmModel = oneStackLoad(trainedModelDir);
-    % nucSeg
-    nucSeg = bwconncomp(logical(nuc), 26);
-    nucSeg = double(labelmatrix(nucSeg));
-    % make div
-    data = stack2Cent( nucSeg, resXY, resZ );
-    data = nnOneMul(data, Inf);
-    data = makeLineage(data);
-    [~, div, ~] = divFind(data);
-    nuc=replace(nucSeg, data(:,5), data(:,10));
-else
-    nucImg = [];
-    nucSeg = [];
-    div = [];
-    svmModel = [];
-end
-
-% waitbar
-waitbar(0.2, h);
-
 %% Pre-processing
 % label nuc
 oriEmbReg = embReg;
+% lab = bwconncomp(nuc, 26);
+% lab = labelmatrix(lab);
+% lab = double(lab);
 
 % All nuclei enclosed in the embryoni region?
 if ~isempty(setdiff(nonzeros(nuc), nonzeros(immultiply(nuc, embReg))))
@@ -174,14 +150,13 @@ for a=1:length(alphas)
     end
     seg=tikan(watTrue, conv(:,1), conv(:,2));
     
-    % Apply cytokinesis % if needed
-    if ~isempty(varargin)
-%         [seg, noFilled, newNuc] = applyCytokinesisFun(nucImg, nuc, nucSeg, memb, seg, div, svmModel);
-        [seg, noFilled, nuc] = applyCytokinesisFun(nucImg, nuc, nucSeg, memb, seg, div, svmModel);
-    else
+%     % Apply cytokinesis % if needed
+%     if ~isempty(varargin)
+%         [seg, noFilled, newNuc] = applyCytokinesisFun( nucImg, nuc, nucSeg, oriMemb, seg, div, svmModel);
+%     else
 %         newNuc = nuc;
-        noFilled = seg;
-    end
+%         noFilled = seg;
+%     end
     
     membStack = logical(imdilate(logical(seg),ones(3,3,3)) - logical(seg));
     membOver=immultiply(memb, membStack);
