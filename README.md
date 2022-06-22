@@ -17,6 +17,7 @@ The paper is [here](https://bmcbioinformatics.biomedcentral.com/articles/10.1186
 </p>
 
 
+
 ### File structure
 The following files are required. The file must be exactly named as follows.
 * Membrane_image.tif
@@ -27,14 +28,15 @@ The following files are required. The file must be exactly named as follows.
 Trained_model is available from "/BCOMS2/Sample".
 
 
+
 ### Sample files
 For testing, we prepared sample files in "/BCOMS2/Sample".
 The image information is described in the Parameters.txt file.
 
 
+
 ### Use on MATLAB
 The GUI opens by running "/BCOMS2/MATLAB files/BCOMS2.m".
-
 
 #### 1. Read Image
 Designate the input folder containing the input files described above.
@@ -64,6 +66,7 @@ This result is the final segmentation result.
 The morphological features and cell-cell contact-related features are computed.
 By pushing the "Morphological features", the extraction starts.
 Two excel files are created, one is the morphological features, and the other is the cell-cell contact-related features.
+
 
 
 ### Usage on Windows
