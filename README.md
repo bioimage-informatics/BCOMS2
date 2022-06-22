@@ -23,17 +23,21 @@ The following files are required. The file must be exactly named as follows.
 * Nucleus_segmentation.tif
 * Trained_model.mat
 
-Trained_model is available at "/BCOMS2/Sample".
+Trained_model is available from "/BCOMS2/Sample".
 
-### Usage on GUI
-GUI opens by running "/BCOMS2/MATLAB files/BCOMS2.m".
+### Sample files
+For testing, we prepared sample files in "/BCOMS2/Sample".
+The image information is described in the Parameters.txt file.
+
+### Use on MATLAB
+The GUI opens by running "/BCOMS2/MATLAB files/BCOMS2.m".
 
 #### 1. Read Image
 Designate the input folder containing the input files described above.
-Fill the image information: image resolutions and numbers of Z and T.
+Fill in the image information: image resolutions and numbers of Z and T.
 Check the box if you want to collect division timings between nucleus and membrane.
 By pushing the "Read Images", reading the files starts.
-The images are saved as Mat files at subfolders at ../Output folder.
+The images are saved as Mat files at subfolders in ../Output folder.
 
 #### 2. Z Range Determination
 The Z range is calculated or designated. If you want to determine it automatically, select "Estimate from the membrane image". If you want to manually give the range, select "Designate" and fill like "3-50".
@@ -50,12 +54,15 @@ The result is saved at ../Output/Embryonic_region
 The inter-cell membranes are segmented.
 By pushing the "Segment membrane", the segmentation starts.
 The result is saved at ../Output/Membrane_segmentation
-This result is the finale segmentation result.
+This result is the final segmentation result.
 
 #### 5. Morphological features extraction
-The morphological features and cell-cell contact related features are computed.
+The morphological features and cell-cell contact-related features are computed.
 By pushing the "Morphological features", the extraction starts.
-Two excel files are creasted, one is the morphological features, and the other is the cell-cell contact related features.
+Two excel files are created, one is the morphological features, and the other is the cell-cell contact-related features.
 
 ### Usage on Windows
+If MATLAB is not available, you can install the software on Windows PC.
+The executable file named "BCOMS2_Installer_web.exe" is in the "/BCOMS2/Executable file for Windows" folder.
+
 
