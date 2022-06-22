@@ -1,0 +1,4 @@
+XY resolution: 0.444
+Z resolution: 0.5
+Number of Z: 52
+Number of T: 30
