@@ -65,7 +65,7 @@ By pushing the "Morphological features", the extraction starts.
 Two excel files are created, one is the morphological features, and the other is the cell-cell contact-related features.
 <br><br>
 
-### Usage on Windows
+### Execution on Windows
 If MATLAB is not available, you can install the software on Windows PC.
 The executable file named "BCOMS2_Installer_web.exe" is in the "/BCOMS2/Executable file for Windows" folder.
 <br><br>
