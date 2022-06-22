@@ -25,7 +25,7 @@ The following files are required. The file must be exactly named as follows.
 
 Trained_model is available at "/BCOMS2/Sample".
 
-### GUI
+### Usage on GUI
 GUI opens by running "/BCOMS2/MATLAB files/BCOMS2.m".
 
 #### 1. Read Image
@@ -57,5 +57,5 @@ The morphological features and cell-cell contact related features are computed.
 By pushing the "Morphological features", the extraction starts.
 Two excel files are creasted, one is the morphological features, and the other is the cell-cell contact related features.
 
-### Installation on Windows
+### Usage on Windows
 
