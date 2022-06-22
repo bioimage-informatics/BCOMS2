@@ -1,30 +1,5 @@
 function [ data ] = nnOneMul( data, threDist )
-%NNONEMUL
-%{
-＜アルゴリズム＞
-トラッキングは、postからpreに最短の核を対応付ける
-
-＜データ型＞
-Output
-TrackData昔: c, r, z, t, ID, Name
-TrackData昔: c, r, z, t, 5:ID, 6:PreID, 7:dist
-TrackData今: c, r, z, t, 5:ID, 6:PreID, 7:dist, 8:PostID, 9:dist
-
-＜よく起こるエラー＞
-エラー: nnOneMul (line 96)
-data=[data, oriPoint1Id(r), val21];
-このエラーは時間がおかしい：複数タイムポイントの核が同じIDを与えられている
-
-%}
-
-% 開発用
-% close all force;
-% imtool close all;
-% clear;
-% clc;
-% 
-% load('data5')
-% data = data(:,1:5);% temp
+% Nearest neighbor from post to pre
 
 
 point1=double(data);
@@ -57,8 +32,8 @@ diff = sqrt(diffR + diffC + diffZ);
 %        |
 %        V
 
-% タイムポイントが一つずれている座標以外はINFにする
-% 後ろから前
+% INF for different TPs
+% from post to pre
 point2Tsub = point2T -1;
 [mesh1T,mesh2T]=meshgrid(point1T,point2Tsub);
 diff21T = (mesh1T - mesh2T).^2;
@@ -70,7 +45,7 @@ diff21(logical(eye(size(diff21)))) = Inf;
 
 diff21(diff21>threDist) = Inf;
 
-% 前から後ろ
+% from pre to post
 point1Tsub = point1T -1;
 [mesh1T,mesh2T]=meshgrid(point1Tsub,point2T);
 diff12T = (mesh2T - mesh1T).^2;
@@ -86,12 +61,12 @@ diff12(diff12>threDist) = Inf;
 [val21,r] = min(diff21,[],2);%c is the column position of minimum value in each row.
 oriPoint1Id = point1(:,5);
 data=[data, oriPoint1Id(r), val21];
-% 閾値以内にPreがいる核だけ取り出す（それ以外は除去）
+% thresholding
 withinThresh = ~isinf(val21);
 timeOneLines = data(:,4) == min(data(:,4));
 okLines = logical(withinThresh + timeOneLines);
 data = data(okLines,:);
-%T=1の処理
+% T=1
 data(data(:,4)==1,6)=0;
 data(data(:,4)==1,7)=0;
 
@@ -99,11 +74,11 @@ data(data(:,4)==1,7)=0;
 [val21,r] = min(diff12,[],2);%c is the column position of minimum value in each row.
 oriPoint1Id = point1(:,5);
 data=[data, oriPoint1Id(r), val21];
-% 閾値以内にPreがいる核だけ取り出す（それ以外は除去）
+% thresholding
 withinThresh = ~isinf(val21);
 timeEndLines = data(:,4) == max(data(:,4));
 okLines = logical(withinThresh + timeEndLines);
 data = data(okLines,:);
-%T=1の処理
+% T=1の処理
 data(data(:,4)==max(data(:,4)),8)=0;
 data(data(:,4)==max(data(:,4)),9)=0;

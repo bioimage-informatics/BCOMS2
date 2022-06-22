@@ -50,7 +50,7 @@ if ~isempty(varargin)
     data = nnOneMul(data, Inf);
     data = makeLineage(data);
     [~, div, ~] = divFind(data);
-    nuc=replace(nucSeg, data(:,5), data(:,10));
+    nuc=tikan(nucSeg, data(:,5), data(:,10));
 else
     nucImg = [];
     nucSeg = [];
@@ -129,11 +129,11 @@ waitbar(0.3, h);
 
 %% Watershed
 
-% alphas=0:0.1:0.3; % if alphas are evaluated
-alphas=0;
+alphas=0:0.3:1; % if alphas are evaluated
+% alphas=0;
 
-% parfor a=1:length(alphas)
-for a=1:length(alphas)
+parfor a=1:length(alphas)
+% for a=1:length(alphas)
     alpha=alphas(a);
     
     % sum with distTransform
@@ -151,7 +151,7 @@ for a=1:length(alphas)
     watSmall=watershed(merge,26);
     watSmall=immultiply(double(watSmall),smallEmbReg);
     
-    waitbar(0.4, h);
+%     waitbar(0.4, h);
     
     % Re-try with the actual embReg ---------
     dStack = ratioDst( watSmall, ratio, 3 );
@@ -163,7 +163,7 @@ for a=1:length(alphas)
     watTrue=watershed(dStack,26);
     watTrue=immultiply(double(watTrue),embReg);
     
-    waitbar(0.5, h);
+%     waitbar(0.5, h);
     
     % Nucleus IDs (colors) are used for those of cells
     conv = unique([watTrue(logical(nucSmall)) nucSmall(logical(nucSmall))], 'rows');
@@ -176,11 +176,11 @@ for a=1:length(alphas)
     
     % Apply cytokinesis % if needed
     if ~isempty(varargin)
-%         [seg, noFilled, newNuc] = applyCytokinesisFun(nucImg, nuc, nucSeg, memb, seg, div, svmModel);
-        [seg, noFilled, nuc] = applyCytokinesisFun(nucImg, nuc, nucSeg, memb, seg, div, svmModel);
-    else
-%         newNuc = nuc;
-        noFilled = seg;
+        try
+            [seg, ~, newNuc] = applyCytokinesisFun(nucImg, nuc, nucSeg, memb, seg, div, svmModel);
+        catch
+            newNuc = nuc;
+        end
     end
     
     membStack = logical(imdilate(logical(seg),ones(3,3,3)) - logical(seg));
@@ -195,7 +195,7 @@ for a=1:length(alphas)
     membOverSN = membOverMean./memRevbOverMean;
     
     % Number of missed nuclei
-    missedNum = arrayfun(@(x) length(setdiff(unique(nonzeros(nuc(:,:,:,x))), unique(nonzeros(seg(:,:,:,x))))), 1:tLen);
+    missedNum = arrayfun(@(x) length(setdiff(unique(nonzeros(newNuc(:,:,:,x))), unique(nonzeros(seg(:,:,:,x))))), 1:tLen);
     
     % score
     score =  [tList', repmat(alpha, [length(membOverSN) 1]), membOverSN', missedNum'];

@@ -124,10 +124,10 @@ guidata(hObject, handles);
 % Folders
 handles.zRangeDir = [handles.resultDir, filesep, 'ZRange'];
 handles.membImgDir = [handles.resultDir, filesep, 'Membrane_image'];
-handles.nucImgDir = [handles.resultDir, filesep, 'Nuclear_image'];
+handles.nucImgDir = [handles.resultDir, filesep, 'Nucleus_image'];
 handles.embRegDir = [handles.resultDir, filesep, 'Embryonic_region'];
 handles.membSegDir = [handles.resultDir, filesep, 'Membrane_segmentation'];
-handles.nucSegDir = [handles.resultDir, filesep, 'Nuclear_segmentation'];
+handles.nucSegDir = [handles.resultDir, filesep, 'Nucleus_segmentation'];
 handles.embRegStackDir = [handles.resultDir, filesep, 'Embryonic_region', filesep, 'Stack'];
 handles.membSegStackDir = [handles.membSegDir, filesep, 'MatFile'];
 handles.morphFeatDir = [handles.resultDir, filesep, 'Morphological_features'];
@@ -278,7 +278,7 @@ if handles.collectionDiv
         set(ed, 'WindowStyle', 'modal');
     end
     try
-        tifRead([handles.inputDir, filesep, filename], handles.numZ, handles.numT, handles.nucImgDir)
+        tifRead([handles.inputDir, filesep, filename], handles.numZ, handles.numT, handles.nucSegDir)
     catch
         delete(h)
         ed = errordlg('Could not read Nucleus\_segmentation file','Error');

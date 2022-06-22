@@ -1,71 +1,61 @@
 function [ data ] = makeLineage( data )
 % function [ data, divIDs, divNames, divDists ] = makeLineage( data )
-%MAKELINEAGE この関数の概要をここに記述
 %{
-＜アルゴリズム＞
-for t でpreIDのNameをコピーする
+＜algorithm＞
+for t 
+    copy NAME of preID
 
-＜データ型＞
+＜data type＞
 Input
-TrackData昔: c, r, z, t, 5:ID, 6:PreID, 7:dist
-TrackData今: c, r, z, t, 5:ID, 6:PreID, 7:dist, 8:PostID, 9:dist
+data: c, r, z, t, 5:ID, 6:PreID, 7:dist, 8:PostID, 9:dist
 
 Output
-TrackData昔: c, r, z, t, 5:ID, 6:PreID, 7:dist, 8:Name
-TrackData昔: c, r, z, t, 5:ID, 6:PreID, 7:dist, 8:PostID, 9:dist, 10:Name
-Division昔: t, motherID, daughterID1, daughterID2
+data: c, r, z, t, 5:ID, 6:PreID, 7:dist, 8:PostID, 9:dist, 10:Name
 divIDs: t, motherID, daughterID1, daughterID2, daughterID3, ...
 divNames: t, motherName, daughterName1, daughterName2, daughterName3, ...
 DivisionDist: t, moterhID, dist1, dist2, dist3, ...
 
-＜ToDo＞
-T=6→7でColor3→4、4→2になてしまう→解決！
 %}
 
-% dataにName列を作成
+% add NAME
 data=[data, zeros([size(data,1),1])];
-data(data(:,4)==1,10)=data(data(:,4)==1,5);%T=1はIDと同じName
+data(data(:,4)==1,10)=data(data(:,4)==1,5);%T=1
 
-% divIDs=[];
-% divNames=[];
-% divDists=[];
+
 for t=2:max(data(:,4))
-%     if t==102
-%         t
-%     end
     
-    % thisTのpreを調べる
+    % pre in thisT
     preIDCands=data(data(:,4)==t,6);
     
-    % preIDのうち、ID行に含まれていないものは、距離の閾値で除去されたので、取り除く
+    % thresholding
     preIDs = preIDCands(ismember(preIDCands, data(:,5)));
     rmvdPreIDs = setdiff(preIDCands, preIDs);
     data(ismember(data(:,6), rmvdPreIDs),:)=[];
     
-    % 分裂の検出
+    % find divisions
     uniPreIDs=unique(preIDs);
     numPreIDs=arrayfun(@(x) sum(preIDs==x), uniPreIDs);
     divPreIDs=uniPreIDs(numPreIDs>=2);
     nondivPreIDs=setdiff(uniPreIDs, divPreIDs);
     
-    % 分裂していない場合、IDをコピー
-    [nowA, nowB]=ismember(data(:,6), nondivPreIDs);%分裂していない核がPre列に含まれるLines（Post time）
+    % copy ID when no divisions
+    [nowA, nowB]=ismember(data(:,6), nondivPreIDs);
     
-    [preA, preB]=ismember(data(:,5), nondivPreIDs);%分裂していない核がID列に含まれるLines（Pre time）
+    [preA, preB]=ismember(data(:,5), nondivPreIDs);
     nondivNameLines = data(preA,10);
     nondivNameLines = nondivNameLines(preB(preA));
-    data(nowA,10)=nondivNameLines(nowB(nowA));%順番を維持して置き換えするので複雑になる
+    data(nowA,10)=nondivNameLines(nowB(nowA));
     
     
-    % 分裂した場合、IDを更新する
+    % update ID when divisions
     if any(divPreIDs)
         maxPreName=max(data(:,10));
         for thisPreID=divPreIDs'
-            % 分裂後の核に新しいIDを与える
-            divLines=ismember(data(:,6), thisPreID);%thisPreにつながれたLines
+            % New ID for newly born nuclei
+            divLines=ismember(data(:,6), thisPreID);
             data(divLines,10)=(maxPreName+1:maxPreName+sum(divLines))';
             
-            % maxPreNameの更新
+            % update maxPreName
             maxPreName=maxPreName+sum(divLines);
         end
     end
