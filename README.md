@@ -6,7 +6,7 @@ The old version is available from the following link:
 https://github.com/bcomsCelegans/BCOMS
 
 The paper is [here](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-017-1717-6).
-
+<br><br>
 
 ### Examples
 <p>
@@ -15,11 +15,7 @@ The paper is [here](https://bmcbioinformatics.biomedcentral.com/articles/10.1186
   <img height="140px" src="/Pictures/24cells.png">
   <img height="140px" src="/Pictures/44cells.png">
 </p>
-
-
-
-
-
+<br><br>
 
 ### File structure
 The following files are required. The file must be exactly named as follows.
@@ -29,14 +25,12 @@ The following files are required. The file must be exactly named as follows.
 * Trained_model.mat
 
 Trained_model is available from "/BCOMS2/Sample".
-
-
+<br><br>
 
 ### Sample files
 For testing, we prepared sample files in "/BCOMS2/Sample".
 The image information is described in the Parameters.txt file.
-
-
+<br><br>
 
 ### Use on MATLAB
 The GUI opens by running "/BCOMS2/MATLAB files/BCOMS2.m".
@@ -69,11 +63,10 @@ This result is the final segmentation result.
 The morphological features and cell-cell contact-related features are computed.
 By pushing the "Morphological features", the extraction starts.
 Two excel files are created, one is the morphological features, and the other is the cell-cell contact-related features.
-
-
+<br><br>
 
 ### Usage on Windows
 If MATLAB is not available, you can install the software on Windows PC.
 The executable file named "BCOMS2_Installer_web.exe" is in the "/BCOMS2/Executable file for Windows" folder.
-
+<br><br>
 
